@@ -78,17 +78,47 @@ export class Services {
     }
   }
 
-  async getPosts(query= [Query.equal('status', 'active')]) {
-    try{
-        return await this.databases.listDocuments(
-            conf.appwriteDatabaseId,
-            conf.appwriteCollectionId,
-        )
+  async getPosts(queries = [Query.equal("status", "active")]) {
+    try {
+      return await this.databases.listDocuments(
+        conf.appwriteDatabaseId,
+        conf.appwriteCollectionId,
+        queries,
+        100
+      );
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  }
+
+  async uploadFile(file) {
+    try {
+      return await this.bucket.createFile(
+        conf.appwriteBucketId,
+        ID.unique(),
+        file
+      )
     }
     catch (error) {
-        console.log(error);
-        return false;
+      return false;
     }
+  }
+  
+  async deleteFile(fileId) {
+    try {
+      await this.bucket.deleteFile(conf.appwriteBucketId, fileId)
+      return true;
+    }
+    catch(error) {
+      console.log(error);
+    }
+  }
+
+  async getFilePreview(fileId) {
+    return this.bucket.getFilePreview(
+      conf.appwriteBucketId,
+      fileId)
   }
 }
 
